@@ -1,36 +1,89 @@
-library(pracma)
 library(shiny)
+library(shinyBS)
+library(shinyWidgets)
+library(shinydashboard)
 
-ui <- fluidPage(
-  headerPanel("Coin Flip Randomness Tester"),
-  sidebarPanel(
+library(pracma)
+
+ui <- dashboardPage(
+  dashboardHeader(
+    title = 'WDSS: Random Coin Flips Tester',
+    titleWidth = 400,
+    tags$li(
+      actionLink(
+        "open_modal",
+        label = "",
+        title = "Info",
+        icon = icon("question")
+      ),
+      class = "dropdown"
+    ),
+    tags$li(
+      a(
+        href = paste0('https://research.wdss.io/',
+                      'random-coin-flips'),
+        target = '_blank',
+        icon("file-alt"),
+        title = "Write-up",
+      ),
+      class = "dropdown"
+    ),
+    tags$li(
+      a(
+        href = paste0('https://github.com/warwickdatascience/',
+                      'random-coin-flips'),
+        target = '_blank',
+        icon("github"),
+        title = "Source",
+      ),
+      class = "dropdown"
+    )
+  ),
+  dashboardSidebar(
+    width = 400,
     textInput(inputId = "coinstring", "Input Coin Flip Series:"),
     htmlOutput(outputId = "sampledata"),
     selectInput(inputId = "stringlength", "Input Series Length:", c(32, 64)),
     sliderInput(inputId = "coinprob", "Input Coin Bias:", 0, 1, 0.5, step = NULL, round = FALSE),
     textOutput(outputId = "warning"),
-    actionButton(inputId = "comp", "Compute p-values")
+    actionButton(inputId = "comp", "Run tests")
   ),
-  mainPanel(
-    tabsetPanel(
-      tabPanel(
-        "Main Screen",
-        tableOutput(outputId = "datatable"),
-        plotOutput(outputId = "KSplot")
+  dashboardBody(
+    tags$head(
+      tags$link(rel = "icon", type = "image/x-icon", href = "favicon.ico"),
+      tags$link(rel = 'stylesheet', type = 'text/css', href = 'style.css'),
+      tags$style(HTML('
+        /* logo */
+        .skin-blue .main-header .logo {
+                              background-color: #0A1A61;
+                              }
+
+        /* logo when hovered */
+        .skin-blue .main-header .logo:hover {
+                              background-color: #1B3897;
+                              }
+
+        /* navbar (rest of the header) */
+        .skin-blue .main-header .navbar {
+                              background-color: #1B3897;
+                              }   
+                              
+         /* toggle button when hovered  */                    
+         .skin-blue .main-header .navbar .sidebar-toggle:hover{
+                              background-color: #142b75;
+                              }
+                      '))
+    ),
+    fluidRow(
+      box(
+        id = 'data_table',
+        width = 4,
+        tableOutput(outputId = "datatable")
       ),
-      {
-        tabPanel(
-          "User Manual",
-          textOutput(outputId = "instruc1"),
-          textOutput(outputId = "instruc2"),
-          textOutput(outputId = "instruc3"),
-          textOutput(outputId = "instruc4"),
-          textOutput(outputId = "instruc5"),
-          textOutput(outputId = "instruc6"),
-          textOutput(outputId = "instruc7"),
-          textOutput(outputId = "instruc8")
-        )
-      }
+      box(
+        id = 'plot',
+        plotOutput(outputId = "KSplot")
+      )
     )
   )
 )
@@ -52,7 +105,7 @@ server <- function(input, output) {
           "Multinomial(2) test",
           "Last eq. test"
         ),
-        "Pvalues" = c(
+        "p-values" = c(
           berpval(y, p),
           maxrunpval(length(y), p, argmax(y)),
           numrunpval(length(y), p, argrun(y)),
@@ -60,7 +113,7 @@ server <- function(input, output) {
           multipval(length(y), p, roveck(y, 2)),
           lasteqpval(length(y), lasteqstat(y), p)
         ),
-        "Metrics" = c(
+        "metrics" = c(
           NA,
           NA,
           NA,
@@ -128,46 +181,39 @@ server <- function(input, output) {
       pplot()
     }
   })
-  {
-    output$instruc1 <- renderText({
-      "This app measures the user’s ability
-    to simulate a believable series of coin flips."
-    })
-    output$instruc2 <- renderText({
-      "Type a series of ones and zeros
-    into the box saying 'Input Coin Flip Series'."
-    })
-    output$instruc3 <- renderText({
-      "The ones and zeros can be interpreted
-    as heads and tails of a hypothetical coin respectively.
-    The program treats any characters that are neither one nor zero as zeros."
-    })
-    output$instruc4 <- renderText({
-      "The input series is accepted if its length coincides with the chosen sample size,
-    which can be changed in the box saying 'Input Series Length'.
-    If the input binary string has the incorrect length, the program will
-    inform you about the current length of the input string,
-    so you will know how many terms to add or subtract."
-    })
-    output$instruc5 <- renderText({
-      "Then, choose the hypothesised bias of the coin you simulated such
-    that it lies between zero and one using the 'Input Coin Bias' slider.
-    The program will not compute the p-values if the set bias is an integer;
-    the program will warn you if it is an integer."
-    })
-    output$instruc6 <- renderText({
-      "Upon pressing the 'Compute p-values' button, the 'Main Screen'
-    tab will show a table of values and a plot."
-    })
-    output$instruc7 <- renderText({
-      "The 'Pvalues' column shows the p-values from each hypothesis test
-    applied to the input series, while the 'Metrics' column shows test values
-    that are not p-values."
-    })
-    output$instruc8 <- renderText({
-      "Overall, the closer each p-value is to one, and the closer the metric
-    is to zero, the more your input series looks like a series of coin flips."
-    })
-  }
+  observeEvent(input$open_modal, {
+    showModal(
+      modalDialog(title = "Information", easyClose = TRUE,
+                  HTML(paste(
+                    sep = "<br>",
+                    "This app measures the user’s ability
+                    to simulate a believable series of coin flips.",
+                    "The ones and zeros can be interpreted
+                    as heads and tails of a hypothetical coin respectively.
+                    The program treats any characters that are neither one nor 
+                    zero as zeros.",
+                    "The input series is accepted if its length coincides with 
+                    the chosen sample size, which can be changed in the box 
+                    saying 'Input Series Length'.
+                    If the input binary string has the incorrect length, 
+                    the program will inform you about the current length of 
+                    the input string, so you will know how many terms to add 
+                    or subtract.",
+                    "Then, choose the hypothesised bias of the coin you 
+                    simulated such that it lies between zero and one using the 
+                    'Input Coin Bias' slider.The program will not compute the 
+                    p-values if the set bias is an integer;
+                    the program will warn you if it is an integer.",
+                    "Upon pressing the 'Run test' button, a table with the 
+                    p-values and metrics together with a will be displayed plot.",
+                    "The 'p.values' shows the p-values from each 
+                    hypothesis test applied to the input series, while the 
+                    'metrics' column shows test values which are not p-values.",
+                    "Overall, the closer each p-value is to one, and the 
+                    closer the metric is to zero, the more your input series 
+                    looks like a series of coin flips."
+                  )))
+    )
+  })
 }
 shinyApp(ui = ui, server = server)

@@ -1,0 +1,30 @@
+.box {
+    margin-bottom: 0;
+}
+
+#choice_prompt {
+  display: inline;
+}
+
+#prompt-container {
+  display: table;
+  width: 100%;
+  height: 100%;
+}
+
+#prompt-container p {
+  display: table-cell;
+  text-align: center;
+  vertical-align: middle;
+  color: indianred;
+  font-size: 16pt;
+}
+
+#compat-info {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.tooltip {
+  width: 200px;
+}
