@@ -1,3 +1,4 @@
+library(pracma)
 library(shiny)
 
 ui <- fluidPage(
@@ -35,12 +36,6 @@ ui <- fluidPage(
 )
 
 server <- function(input, output) {
-  # Install pracma (user library) and shiny (system library)
-  {
-    library(pracma)
-    library(shiny)
-  }
-
   # Main body
   {
     # Function for converting binary strings into
