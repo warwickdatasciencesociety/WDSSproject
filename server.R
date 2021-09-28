@@ -1,76 +1,12 @@
 library(shiny)
-library(shinyBS)
-library(shinyWidgets)
 library(shinydashboard)
 
 library(pracma)
 
-ui <- dashboardPage(
-  dashboardHeader(
-    title = 'WDSS: Random Coin Flips Tester',
-    titleWidth = 400,
-    tags$li(
-      actionLink(
-        "open_modal",
-        label = "",
-        title = "Info",
-        icon = icon("question")
-      ),
-      class = "dropdown"
-    ),
-    tags$li(
-      a(
-        href = paste0('https://research.wdss.io/',
-                      'random-coin-flips'),
-        target = '_blank',
-        icon("file-alt"),
-        title = "Write-up",
-      ),
-      class = "dropdown"
-    ),
-    tags$li(
-      a(
-        href = paste0('https://github.com/warwickdatascience/',
-                      'random-coin-flips'),
-        target = '_blank',
-        icon("github"),
-        title = "Source",
-      ),
-      class = "dropdown"
-    )
-  ),
-  dashboardSidebar(
-    width = 400,
-    textInput(inputId = "coinstring", "Input Coin Flip Series:"),
-    htmlOutput(outputId = "sampledata"),
-    selectInput(inputId = "stringlength", "Input Series Length:", c(32, 64)),
-    sliderInput(inputId = "coinprob", "Input Coin Bias:", 0, 1, 0.5, step = NULL, round = FALSE),
-    textOutput(outputId = "warning"),
-    actionButton(inputId = "comp", "Run tests")
-  ),
-  dashboardBody(
-    tags$head(
-      tags$link(rel = "icon", type = "image/x-icon", href = "favicon.ico"),
-      tags$link(rel = 'stylesheet', type = 'text/css', href = 'style.css')
-    ),
-    fluidRow(
-      box(
-        id = 'data_table',
-        width = 4,
-        tableOutput(outputId = "datatable")
-      ),
-      box(
-        id = 'plot',
-        plotOutput(outputId = "KSplot")
-      )
-    )
-  )
-)
-
 server <- function(input, output) {
   # read-in util functions
   source("util.R")
-
+  
   # Data table code
   {
     # Create data table of p-values and test metrics
@@ -104,7 +40,7 @@ server <- function(input, output) {
       return(d)
     }
   }
-
+  
   output$sampledata <- renderUI({
     if (nchar(input$coinstring) != as.numeric(input$stringlength)) {
       HTML(paste(
@@ -145,8 +81,8 @@ server <- function(input, output) {
   output$datatable <- renderTable({
     if (
       (nchar(input$coinstring) == as.numeric(input$stringlength)) &
-        (as.numeric(input$coinprob) != 0) &
-        (as.numeric(input$coinprob) != 1)
+      (as.numeric(input$coinprob) != 0) &
+      (as.numeric(input$coinprob) != 1)
     ) {
       pcalc()
     }
@@ -154,8 +90,8 @@ server <- function(input, output) {
   output$KSplot <- renderPlot({
     if (
       (nchar(input$coinstring) == as.numeric(input$stringlength)) &
-        (as.numeric(input$coinprob) != 0) &
-        (as.numeric(input$coinprob) != 1)
+      (as.numeric(input$coinprob) != 0) &
+      (as.numeric(input$coinprob) != 1)
     ) {
       pplot()
     }
@@ -195,4 +131,3 @@ server <- function(input, output) {
     )
   })
 }
-shinyApp(ui = ui, server = server)
