@@ -51,28 +51,7 @@ ui <- dashboardPage(
   dashboardBody(
     tags$head(
       tags$link(rel = "icon", type = "image/x-icon", href = "favicon.ico"),
-      tags$link(rel = 'stylesheet', type = 'text/css', href = 'style.css'),
-      tags$style(HTML('
-        /* logo */
-        .skin-blue .main-header .logo {
-                              background-color: #0A1A61;
-                              }
-
-        /* logo when hovered */
-        .skin-blue .main-header .logo:hover {
-                              background-color: #1B3897;
-                              }
-
-        /* navbar (rest of the header) */
-        .skin-blue .main-header .navbar {
-                              background-color: #1B3897;
-                              }   
-                              
-         /* toggle button when hovered  */                    
-         .skin-blue .main-header .navbar .sidebar-toggle:hover{
-                              background-color: #142b75;
-                              }
-                      '))
+      tags$link(rel = 'stylesheet', type = 'text/css', href = 'style.css')
     ),
     fluidRow(
       box(
